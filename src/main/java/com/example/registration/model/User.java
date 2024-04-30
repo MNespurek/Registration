@@ -1,7 +1,11 @@
 package com.example.registration.model;
 
-addimport com.example.registration.RegistrationException;
+import com.example.registration.RegistrationException;
 import com.example.registration.config.Settings;
+import com.example.registration.repository.UserRepository;
+import com.example.registration.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -9,6 +13,7 @@ import java.io.FileReader;
 import java.security.InvalidParameterException;
 import java.sql.*;
 import java.util.*;
+
 
 public class User {
     private String name;
@@ -25,6 +30,10 @@ public class User {
         setPersonId(personId);
         this.uniqueId = UUID.randomUUID();
     }
+    @Autowired
+    UserService userService;
+    UserRepository userRepository;
+
 
     public UUID getUniqueId() {
         return uniqueId;
@@ -62,40 +71,9 @@ public class User {
         else System.out.println("Zadaná hodnota "+personId+ " není definována v souboru možných hodnot " +Settings.getPersonIdFile()+ ".");
     }
 
-    public Set<String> setOfIdsFromDatabase() throws SQLException {
-        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/", "root", "Heslo123");
-        Statement statement = connection.createStatement();
-        ResultSet selectPersonIdFromUsers = statement.executeQuery("Select personId from users");
-        Set<String> setOfIdFromUsers = new HashSet<>();
-        while (selectPersonIdFromUsers.next()) {
-            String personIdFromUsers = String.valueOf(selectPersonIdFromUsers.next());
-            setOfIdFromUsers.add(personIdFromUsers);
-        }
-        return setOfIdFromUsers;
-    }
-
-
-    public Set<String> setOfIdsFromFile() throws FileNotFoundException, SQLException, RegistrationException {
-        Set<String> setFromDataPersonId = new HashSet<>();
-
-        try(Scanner scanner = new Scanner(new BufferedReader(new FileReader(Settings.getPersonIdFile())))) {
-            scanner.nextLine();
-            while (scanner.hasNextLine()) {
-                String personIdFromFile = scanner.nextLine();
-                setFromDataPersonId.add(personIdFromFile);
-
-            }
-            return setFromDataPersonId;
-
-
-        }catch (FileNotFoundException e) {
-            throw new RegistrationException("Soubor "+Settings.getPersonIdFile()+ "nebyl nalezen!" +e);
-        }
-    }
-
     public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
-        Set<String> setOfIdsFromFile = setOfIdsFromFile();
-        Set<String> setOfIdsFromDatabase = setOfIdsFromDatabase();
+        Set<String> setOfIdsFromFile = userService.setOfIdsFromFile();
+        Set<String> setOfIdsFromDatabase = userRepository.setOfIdsFromDatabase();
         setOfIdsFromFile.removeAll(setOfIdsFromDatabase);
         Set<String> setOfIdsToSelectFrom = setOfIdsFromFile;
         return setOfIdsToSelectFrom;
