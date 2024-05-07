@@ -6,14 +6,13 @@ import com.example.registration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileNotFoundException;
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class UserRepository {
-@Autowired
-User user;
+
 
     public ResultSet connectionToDatabaseResultset(String query) throws SQLException, RegistrationException {
         try {
@@ -64,14 +63,26 @@ User user;
         }
     }
 
-    public String getUserFromDatabaseByUuidBasicVersion(String uuid) {
-        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByUUID(uuid))) {
+    public void saveEditUserToDatabase(User user) throws SQLException, RegistrationException {
+        SettingsRepository.editUserInDatabase(user);
+        System.out.println("Uživatel s id: "+user.getId()+ "byl úspěšně editován v databázi");
+    }
 
-                Long id = resultSet.getLong(1);
-                String name = resultSet.getString("name");
-                String surname = resultSet.getString("surname");
+    public void deleteUserFromDatabase(String id) throws SQLException, RegistrationException {
+        SettingsRepository.deleteUserFromDatabase(id);
+        System.out.println("Uživatel byl úspěšně editován v databázi");
+    }
 
-        return "Osoba s "+uuid+" má databázové id: "+id+" jméno: "+name+ " a příjmení: " +surname+".";
+
+    public User getUserFromDatabaseByIdBasicVersion(String id) {
+        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdBasicVersion(id))) {
+
+                id = String.valueOf(resultSet.getLong(Math.toIntExact(SettingsRepository.ID)));
+                String name = resultSet.getString(SettingsRepository.NAME);
+                String surname = resultSet.getString(SettingsRepository.SURNAME);
+                User user = new User(id, name, surname);
+
+        return user;
 
 
         } catch (RegistrationException e) {
@@ -81,12 +92,17 @@ User user;
         }
     }
 
-    public User getUserFromDatabaseForEdit(String uuid) {
-        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByUUID(uuid))) {
+    public User getUserFromDatabaseFullVersion(String id) {
+        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdFullVersion(id))) {
+
+            id = String.valueOf(resultSet.getLong(1));
             String name = resultSet.getString(SettingsRepository.NAME);
-            user.setName(name);
             String surname = resultSet.getString(SettingsRepository.SURNAME);
-            user.setSurname(surname);
+            String personId = resultSet.getString(SettingsRepository.PERSONID);
+            UUID uniqueId = UUID.fromString(resultSet.getString(SettingsRepository.UNIQUEID));
+
+            User user = new User(id, name, surname, personId, uniqueId);
+
             return user;
 
 
@@ -94,20 +110,25 @@ User user;
             throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    public String getUserFromDatabaseFullVersion(String uuid) {
-        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByUUID(uuid))) {
 
-            Long id = resultSet.getLong(1);
-            String name = resultSet.getString(SettingsRepository.NAME);
-            String surname = resultSet.getString(SettingsRepository.SURNAME);
-            String personId = resultSet.getString(SettingsRepository.PERSONID);
-            String uniqueId = resultSet.getString(SettingsRepository.UNIQUEID);
+    public List<User> getUsersFromDatabaseBasicVersion() {
+        try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUsersFromDatabaseBasicVersion())) {
+            List<User> usersList = new ArrayList<>();
+            while (resultSet.next()) {
+                String id = String.valueOf(resultSet.getLong(1));
+                String name = resultSet.getString(SettingsRepository.NAME);
+                String surname = resultSet.getString(SettingsRepository.SURNAME);
+                User user = new User(id, name, surname);
+                usersList.add(user);
 
-            return "Osoba s "+uuid+" má databázové id: "+id+" jméno: "+name+ " a příjmení: " +surname+" personId: "+personId+ " uuid: "+uniqueId+".";
 
+            }
+            return usersList;
 
         } catch (RegistrationException e) {
             throw new RuntimeException(e);
@@ -115,7 +136,26 @@ User user;
             throw new RuntimeException(e);
         }
     }
+        public List<User> getUsersFromDatabaseFullVersion() {
 
-}
+            try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUsersFromDatabaseFullVersion())) {
+                List<User> usersList = new ArrayList<>();
+                while (resultSet.next()) {
+                    String id = String.valueOf(resultSet.getLong(1));
+                    String name = resultSet.getString(SettingsRepository.NAME);
+                    String surname = resultSet.getString(SettingsRepository.SURNAME);
+                    User user = new User(id, name, surname);
+                    usersList.add(user);
 
+
+                }
+                return usersList;
+
+            } catch (RegistrationException e) {
+                throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 

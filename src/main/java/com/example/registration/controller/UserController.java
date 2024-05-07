@@ -19,49 +19,50 @@ import java.util.List;
 @RestController
 public class UserController {
     @Autowired
-    User user;
-    UserRepository userRepository;
+    UserService userService;
+
     @PostMapping("user")
     public String saveUser(@RequestBody User user) throws RegistrationException, SQLException {
-        userRepository.saveUserToDatabase(user);
+        userService.saveUserToDatabase(user);
         return "Uživatel s "+user.getUniqueId()+ " byl úspěšně uložen do databáze.";
     }
 
     @GetMapping("/user/{ID}")
-    public String getId(@PathVariable(value = "id") String uuid, @RequestParam(value = "detail", required = false) Boolean detail) {
-        String returnStatement = "";
+    public User getId(@PathVariable(value = "id") String id, @RequestParam(value = "detail", required = false) Boolean detail) {
+        User returnUser;
         if(detail=true){
-            returnStatement = userRepository.getUserFromDatabaseFullVersion(uuid);
+            returnUser = userService.getUserFromDatabaseByIdBasicVersion(id);
         }
-        else returnStatement = userRepository.getUserFromDatabaseByUuidBasicVersion(uuid);
+        else returnUser = userService.getUserFromDatabaseByIdFullVersion(id);
 
-        return returnStatement;
+        return returnUser;
     }
-
-    /*@GetMapping("/users/{ID}?detail=true")
-    public String getIdFullVersion(@PathVariable(value="id")String uuid, @RequestParam(value = "detail") Boolean detail) {
-        return userRepository.getUserFromDatabaseFullVersion(uuid);
-    }*/
 
     @GetMapping("/users")
-    public List<User> getUsersBasicVersion(@RequestBody User user, @RequestParam(value = "detail", required = false) Boolean detail) {
+    public List<User> getUsersBasicVersion(@RequestParam(value = "detail", required = false) Boolean detail) {
+        List<User> returnUsers;
+        if(detail=true) {
+            returnUsers = userService.getUsersFromDatabaseFullVersion();
+        }else returnUsers = userService.getUsersFromDatabaseBasicVersion();
 
+        return returnUsers;
 
 
     }
 
-    @PutMapping("/user/{ID}")
-    public String editUser(@RequestBody String name, String surname, @PathVariable(value = "ID") String uuid) {
-        User user = userRepository.getUserFromDatabaseForEdit(uuid);
+    @PutMapping("/user")
+    public User editUser(@RequestBody String name, String surname, String id) throws RegistrationException, SQLException {
+        User user = userService.changeUserNameAndSurname(name, surname, id);
         user.setName(name);
         user.setSurname(surname);
-        return "Upravili jste uživatele s uuid: "+uuid+ " nové jméno je: "+name+ " a příjmení: "+surname+ ".";
+        System.out.println("Upravili jste uživatele s id: "+id+ " nové jméno je: "+user.getName()+ " a příjmení: "+user.getSurname()+ ".");
+        return user;
 
     }
 
     @DeleteMapping("/user/{ID}")
-    public String deleteUser(@PathVariable(value = "ID") String uuid) {
-        SettingsRepository.deleteUserFromDatabaseByUUID(uuid);
-        return "Uživatel s uuid "+uuid+ " by úspěšně vymazán.";
+    public String deleteUser(@PathVariable(value = "ID") String id) throws RegistrationException, SQLException {
+        userService.deleteUserFromDatabaseById(id);
+        return "Uživatel s uuid "+id+ " by úspěšně vymazán.";
     }
 }
