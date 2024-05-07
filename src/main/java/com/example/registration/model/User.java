@@ -15,7 +15,13 @@ import java.sql.*;
 import java.util.*;
 
 
+
+
 public class User {
+    @Autowired
+    UserService userService;
+    UserRepository userRepository;
+    private String id;
     private String name;
 
     private String surname;
@@ -24,16 +30,32 @@ public class User {
 
     private UUID uniqueId;
 
-    public User(String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
+
+
+
+
+    public User(String id, String name, String surname) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
+    }
+
+
+    public User(String id, String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
+        this(id, name, surname);
         setPersonId(personId);
         this.uniqueId = UUID.randomUUID();
     }
-    @Autowired
-    UserService userService;
-    UserRepository userRepository;
 
+    public User(String id, String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
+        this(id, name, surname);
+        setPersonId(personId);
+        this.uniqueId = uniqueId;
+    }
+
+    public String getId() {
+        return id;
+    }
 
     public UUID getUniqueId() {
         return uniqueId;
@@ -68,7 +90,7 @@ public class User {
         if (setOfIdsToSelectFrom.contains(personId)) {
             this.personId = personId;
         }
-        else System.out.println("Zadaná hodnota "+personId+ " není definována v souboru možných hodnot " +Settings.getPersonIdFile()+ ".");
+        else System.out.println("Zadaná hodnota "+personId+ " není definována v souboru možných hodnot " +Settings.PERSONIDFILE+ ".");
     }
 
     public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
