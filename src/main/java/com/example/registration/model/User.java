@@ -1,16 +1,10 @@
 package com.example.registration.model;
 
 import com.example.registration.RegistrationException;
-import com.example.registration.config.Settings;
 import com.example.registration.repository.UserRepository;
 import com.example.registration.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.security.InvalidParameterException;
 import java.sql.*;
 import java.util.*;
 
@@ -18,47 +12,67 @@ import java.util.*;
 
 
 public class User {
-    @Autowired
+
     UserService userService;
     UserRepository userRepository;
-    private String id;
+    private Long id;
     private String name;
 
     private String surname;
 
-    private String personId;
+    private String personID;
 
     private UUID uniqueId;
 
 
+    public User() {
+        this.uniqueId = UUID.randomUUID();
+
+    }
+
+    public User(String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
+        this.name = name;
+        this.surname = surname;
+        this.personID = personId;
+        this.uniqueId = uniqueId;
+
+    }
 
 
-
-    public User(String id, String name, String surname) {
+    public User(Long id, String name, String surname) {
         this.id = id;
         this.name = name;
         this.surname = surname;
+
+
     }
 
-
-    public User(String id, String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
-        this(id, name, surname);
-        setPersonId(personId);
+    public User(Long id, String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.personID = personId;
         this.uniqueId = UUID.randomUUID();
     }
 
-    public User(String id, String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
-        this(id, name, surname);
-        setPersonId(personId);
+
+
+    public User(Long id, String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.personID = personId;
         this.uniqueId = uniqueId;
     }
 
-    public String getId() {
+
+
+    public Long getId() {
         return id;
     }
 
     public UUID getUniqueId() {
-        return uniqueId;
+        return this.uniqueId;
     }
 
     public void setUniqueId(UUID uniqueId) {
@@ -81,23 +95,16 @@ public class User {
         this.surname = surname;
     }
 
-    public String getPersonId() {
-        return personId;
+    public String getPersonID() {
+        return personID;
     }
 
-    public void setPersonId(String personId) throws RegistrationException, SQLException, FileNotFoundException, InvalidParameterException {
+    /*public void setPersonId(String personId) throws RegistrationException, SQLException, FileNotFoundException, InvalidParameterException {
+
         Set<String> setOfIdsToSelectFrom = setOfIdsToSelectFrom();
-        if (setOfIdsToSelectFrom.contains(personId)) {
-            this.personId = personId;
-        }
-        else System.out.println("Zadaná hodnota "+personId+ " není definována v souboru možných hodnot " +Settings.PERSONIDFILE+ ".");
-    }
+        System.out.println(setOfIdsToSelectFrom);
 
-    public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
-        Set<String> setOfIdsFromFile = userService.setOfIdsFromFile();
-        Set<String> setOfIdsFromDatabase = userRepository.setOfIdsFromDatabase();
-        setOfIdsFromFile.removeAll(setOfIdsFromDatabase);
-        Set<String> setOfIdsToSelectFrom = setOfIdsFromFile;
-        return setOfIdsToSelectFrom;
-    }
+    }*/
+
+
 }

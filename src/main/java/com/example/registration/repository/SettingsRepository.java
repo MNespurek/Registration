@@ -4,15 +4,15 @@ import com.example.registration.model.User;
 
 public class SettingsRepository {
 
-    public static final String DATABASEURL = "jdbc:mysql://localhost:3306/";
+    public static final String DATABASEURL = "jdbc:mysql://localhost:3306/users";
 
     public static final String USER = "root";
     public static final String PASSWORD = "Heslo123";
-    public static final String ADDUSERTODATABASE = "INSERT INTO USERS (name, surname, personId, uniqueId) values(?, ?, ?, ?)";
+    public static final String ADDUSERTODATABASE = "INSERT INTO USER (name, surname, personId, uuid) values(?, ?, ?, ?)";
 
     public static final Long ID = 1L;
 
-    public static final String PERSONID = "personId";
+    public static final String PERSONID = "personID";
 
     public static final String NAME = "name";
 
@@ -20,42 +20,29 @@ public class SettingsRepository {
 
     public static final String UNIQUEID = "uniqueId";
 
-    public static final String GETIDSFROMDATABASE = "SELECT Id FROM users";
+    public static final String GETPERSONIDSFROMDATABASE = "SELECT personID FROM user";
 
 
     public static String editUserInDatabase(User user) {
-        return "UPDATE users SET name = "+user.getName()+ ", surname = "+user.getSurname()+" WHERE id = "+user.getId()+";";
+        return "UPDATE user SET name = "+user.getName()+ ", surname = "+user.getSurname()+" WHERE id = "+user.getId()+";";
+        //knihovna SQL Query builder
     }
 
-    public static String deleteUserFromDatabase(String id) {
-        return "DELETE * FROM users WHERE id = "+id+";";
+    public static String deleteUserFromDatabase(Long id) {
+        return "DELETE * FROM user WHERE id = "+id+";";
     }
 
-    public static String getUserFromDatabaseByIdBasicVersion(String id) {
-        return "SELECT name, surname FROM users WHERE uniqueId = "+id+ ";";
+    public static String getUserFromDatabaseByIdBasicVersion(Long id) {
+        return "SELECT name, surname FROM user WHERE uniqueId = "+id+ ";";
     }
 
-    public static String getUserFromDatabaseByIdFullVersion(String id) {
-        return "SELECT * FROM users WHERE uniqueId = "+id+ ";";
+    public static String getUserFromDatabaseByIdFullVersion(Long id) {
+        return "SELECT * FROM user WHERE uniqueId = "+id+ ";";
     }
     public static String getUsersFromDatabaseBasicVersion() {
-        return "SELECT id, name, surname FROM users";
+        return "SELECT id, name, surname FROM user";
     }
 
-    public static String getUsersFromDatabaseFullVersion() { return "SELECT * FROM users;";}
-
-
-
-    public static String deleteUserFromDatabaseByUUID(String id) {
-        return "DELETE * FROM users WHERE uniqueId = "+id+ ";";
-    }
-
-
-
-
-
-
-
-
+    public static String getUsersFromDatabaseFullVersion() { return "SELECT * FROM user";}
 
 }

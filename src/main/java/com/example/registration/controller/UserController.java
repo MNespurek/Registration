@@ -1,19 +1,19 @@
 package com.example.registration.controller;
 
 import com.example.registration.RegistrationException;
+import com.example.registration.config.Settings;
 import com.example.registration.model.User;
-import com.example.registration.repository.SettingsRepository;
-import com.example.registration.repository.UserRepository;
 import com.example.registration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 
+
+//z venku chce mi zasílat v objektu i pohlaví a musí si s tím Controller poradit a dále pracovat. Data uložit do DB
+//vytvářet objekt přes statickou proměnnou createObject s tím, že pokud zadá nevalidní parametr, pouze dojde k upozornění ne že spadne proces
 
 @RequestMapping("api/v1")
 @RestController
@@ -21,14 +21,26 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @PostMapping("user")
-    public String saveUser(@RequestBody User user) throws RegistrationException, SQLException {
-        userService.saveUserToDatabase(user);
-        return "Uživatel s "+user.getUniqueId()+ " byl úspěšně uložen do databáze.";
+    @PostMapping("/user")
+    public String saveUser(@RequestBody User user) throws RegistrationException, SQLException, FileNotFoundException {
+        System.out.println(user.getPersonID());
+        System.out.println(userService.setOfIdsFromDatabase());
+        String statement = "";
+        if (userService.setOfIdsToSelectFrom().contains(user.getPersonID())) {
+            userService.saveUserToDatabase(user);
+            statement = "Uživatel s "+user.getUniqueId()+ "byl úspěšně uložen do databáze";
+        } else if (userService.setOfIdsFromDatabase().contains(user.getPersonID()))
+        {
+            statement = "Zadaná hodnota "+user.getPersonID()+ " již je v databázi použita!";
+        }
+        else statement = "Zadaná hodnota " + user.getPersonID() + " není definována v souboru možných hodnot " + Settings.PERSONIDFILE + ".";
+        return statement;
     }
 
+
+
     @GetMapping("/user/{ID}")
-    public User getId(@PathVariable(value = "id") String id, @RequestParam(value = "detail", required = false) Boolean detail) {
+    public User getId(@PathVariable(value = "ID") Long id, @RequestParam(value = "detail", required = false) Boolean detail) {
         User returnUser;
         if(detail=true){
             returnUser = userService.getUserFromDatabaseByIdBasicVersion(id);
@@ -46,13 +58,11 @@ public class UserController {
         }else returnUsers = userService.getUsersFromDatabaseBasicVersion();
 
         return returnUsers;
-
-
     }
 
     @PutMapping("/user")
-    public User editUser(@RequestBody String name, String surname, String id) throws RegistrationException, SQLException {
-        User user = userService.changeUserNameAndSurname(name, surname, id);
+    public User editUser(@RequestBody Long id, String name, String surname) throws RegistrationException, SQLException {
+        User user = userService.changeUserNameAndSurname(id, name, surname);
         user.setName(name);
         user.setSurname(surname);
         System.out.println("Upravili jste uživatele s id: "+id+ " nové jméno je: "+user.getName()+ " a příjmení: "+user.getSurname()+ ".");
@@ -61,7 +71,7 @@ public class UserController {
     }
 
     @DeleteMapping("/user/{ID}")
-    public String deleteUser(@PathVariable(value = "ID") String id) throws RegistrationException, SQLException {
+    public String deleteUser(@PathVariable(value = "ID") Long id) throws RegistrationException, SQLException {
         userService.deleteUserFromDatabaseById(id);
         return "Uživatel s uuid "+id+ " by úspěšně vymazán.";
     }

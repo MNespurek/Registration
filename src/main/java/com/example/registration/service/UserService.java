@@ -22,12 +22,12 @@ UserRepository userRepository;
     public void saveUserToDatabase(User user) throws RegistrationException, SQLException {
         userRepository.saveUserToDatabase(user);
     }
-    public User getUserFromDatabaseByIdBasicVersion(String id) {
+    public User getUserFromDatabaseByIdBasicVersion(Long id) {
         User userFromRepository = userRepository.getUserFromDatabaseByIdBasicVersion(id);
         return userFromRepository;
     }
 
-    public User getUserFromDatabaseByIdFullVersion(String id) {
+    public User getUserFromDatabaseByIdFullVersion(Long id) {
         User userFromRepository = userRepository.getUserFromDatabaseFullVersion(id);
         return userFromRepository;
 
@@ -46,7 +46,7 @@ UserRepository userRepository;
 
 
 
-    public User changeUserNameAndSurname(String id, String name, String surname) throws RegistrationException, SQLException {
+    public User changeUserNameAndSurname(Long id, String name, String surname) throws RegistrationException, SQLException {
         User userFromRepository = userRepository.getUserFromDatabaseByIdBasicVersion(id);
         userFromRepository.setName(name);
         userFromRepository.setSurname(surname);
@@ -54,7 +54,7 @@ UserRepository userRepository;
         return userFromRepository;
     }
 
-    public String deleteUserFromDatabaseById(String id) throws RegistrationException, SQLException {
+    public String deleteUserFromDatabaseById(Long id) throws RegistrationException, SQLException {
         userRepository.deleteUserFromDatabase(id);
         return "Uživatel s "+id+ "byl vymazán z databáze.";
     }
@@ -78,5 +78,17 @@ UserRepository userRepository;
         }
     }
 
+    public Set<String> setOfIdsFromDatabase() throws RegistrationException, SQLException {
+        return userRepository.setOfPersonIDsFromDatabase();
+    }
+
+    public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
+        Set<String> setOfIdsFromDatabase = setOfIdsFromDatabase();
+        Set<String> setOfIdsFromFile = setOfIdsFromFile();
+        setOfIdsFromFile.removeAll(setOfIdsFromDatabase);
+        Set<String> setOfIdsToSelectFrom = setOfIdsFromFile;
+
+        return setOfIdsToSelectFrom;
+    }
 
 }
