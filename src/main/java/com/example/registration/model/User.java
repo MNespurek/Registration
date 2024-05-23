@@ -30,6 +30,13 @@ public class User {
 
     }
 
+    public User(Long id, String name, String surname) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+    }
+
+
     public User(String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
         this.name = name;
         this.surname = surname;
@@ -39,18 +46,10 @@ public class User {
     }
 
 
-    public User(Long id, String name, String surname) {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
 
-
-    }
 
     public User(Long id, String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
+        this(id, name, surname);
         this.personID = personId;
         this.uniqueId = UUID.randomUUID();
     }
@@ -58,13 +57,10 @@ public class User {
 
 
     public User(Long id, String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
-        this.id = id;
-        this.name = name;
-        this.surname = surname;
+        this(id, name, surname);
         this.personID = personId;
         this.uniqueId = uniqueId;
     }
-
 
 
     public Long getId() {
@@ -79,6 +75,9 @@ public class User {
         this.uniqueId = uniqueId;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
     public String getName() {
         return name;
     }

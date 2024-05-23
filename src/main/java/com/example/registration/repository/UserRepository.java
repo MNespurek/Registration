@@ -3,6 +3,8 @@ package com.example.registration.repository;
 import com.example.registration.RegistrationException;
 import com.example.registration.config.Settings;
 import com.example.registration.model.User;
+import com.example.registration.model.dto.UserDTO;
+import com.example.registration.model.dto.UserFullDTO;
 import org.springframework.stereotype.Repository;
 
 import java.io.FileNotFoundException;
@@ -78,57 +80,61 @@ public class UserRepository {
     }
 
 
-    public User getUserFromDatabaseByIdBasicVersion(Long id) {
-        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdBasicVersion(id))) {
+    public User getUserFromDatabaseByIdBasicVersion(Long id) throws RegistrationException, SQLException {
 
-                id = resultSet.getLong(Math.toIntExact(SettingsRepository.ID));
+        try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdBasicVersion(id))) {
+
+            if (resultSet.next()) {
+                id = resultSet.getLong(SettingsRepository.ID);
                 String name = resultSet.getString(SettingsRepository.NAME);
                 String surname = resultSet.getString(SettingsRepository.SURNAME);
                 User user = new User(id, name, surname);
+                return user;
 
-        return user;
+            } else System.out.println("Uživatel s " + id + " nebyl nalezen");
 
-
-        } catch (RegistrationException e) {
+            return null;
+        }
+        catch (RegistrationException e) {
             throw new RuntimeException(e);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
     }
 
-    public User getUserFromDatabaseFullVersion(Long id) {
-        try(ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdFullVersion(id))) {
+    public User getUserFromDatabaseFullVersion(Long id){
+            try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUserFromDatabaseByIdFullVersion(id))) {
+                if (resultSet.next()) {
 
-            id = resultSet.getLong(1);
-            String name = resultSet.getString(SettingsRepository.NAME);
-            String surname = resultSet.getString(SettingsRepository.SURNAME);
-            String personId = resultSet.getString(SettingsRepository.PERSONID);
-            UUID uniqueId = UUID.fromString(resultSet.getString(SettingsRepository.UNIQUEID));
+                    id = resultSet.getLong(SettingsRepository.ID);
+                    String name = resultSet.getString(SettingsRepository.NAME);
+                    String surname = resultSet.getString(SettingsRepository.SURNAME);
+                    String personId = resultSet.getString(SettingsRepository.PERSONID);
+                    UUID uniqueId = UUID.fromString(resultSet.getString(SettingsRepository.UNIQUEID));
+                    User user = new User(id, name, surname, personId, uniqueId);
+                    return user;
+                } else System.out.println("Uživatel s " + id + " nebyl nalezen");
 
-            User user = new User(id, name, surname, personId, uniqueId);
-
-            return user;
-
-
-        } catch (RegistrationException e) {
-            throw new RuntimeException(e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+            } catch (RegistrationException e) {
+                throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        return null;
     }
 
-
-    public List<User> getUsersFromDatabaseBasicVersion() {
+    public List<UserDTO> getUsersFromDatabaseBasicVersion() {
         try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUsersFromDatabaseBasicVersion())) {
-            List<User> usersList = new ArrayList<>();
+            List<UserDTO> usersList = new ArrayList<>();
             while (resultSet.next()) {
-                Long id = resultSet.getLong(1);
+                Long id = resultSet.getLong(SettingsRepository.ID);
                 String name = resultSet.getString(SettingsRepository.NAME);
                 String surname = resultSet.getString(SettingsRepository.SURNAME);
-                User user = new User(id, name, surname);
-                usersList.add(user);
+                UserDTO userDTO = new UserDTO(id, name, surname);
+                usersList.add(userDTO);
             }
             return usersList;
 
@@ -138,19 +144,19 @@ public class UserRepository {
             throw new RuntimeException(e);
         }
     }
-        public List<User> getUsersFromDatabaseFullVersion() {
+        public List<UserDTO> getUsersFromDatabaseFullVersion() {
 
             try (ResultSet resultSet = connectionToDatabaseResultset(SettingsRepository.getUsersFromDatabaseFullVersion())) {
-                List<User> usersList = new ArrayList<>();
+                List<UserDTO> usersList = new ArrayList<>();
                 while (resultSet.next()) {
                     Long id = resultSet.getLong(1);
                     String name = resultSet.getString(SettingsRepository.NAME);
                     String surname = resultSet.getString(SettingsRepository.SURNAME);
                     String personId = resultSet.getString(SettingsRepository.PERSONID);
                     UUID uniqueId = UUID.fromString(resultSet.getString(SettingsRepository.UNIQUEID));
-                    User user = new User(id, name, surname, personId, uniqueId);
+                    UserFullDTO userFullDTO = new UserFullDTO(id, name, surname, personId, uniqueId);
 
-                    usersList.add(user);
+                    usersList.add(userFullDTO);
 
 
                 }
@@ -159,8 +165,6 @@ public class UserRepository {
             } catch (RegistrationException e) {
                 throw new RuntimeException(e);
             } catch (SQLException e) {
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }

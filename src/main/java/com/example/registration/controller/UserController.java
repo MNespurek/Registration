@@ -3,6 +3,9 @@ package com.example.registration.controller;
 import com.example.registration.RegistrationException;
 import com.example.registration.config.Settings;
 import com.example.registration.model.User;
+import com.example.registration.model.dto.UserBasicDTO;
+import com.example.registration.model.dto.UserDTO;
+import com.example.registration.model.dto.UserFullDTO;
 import com.example.registration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -40,22 +43,26 @@ public class UserController {
 
 
     @GetMapping("/user/{ID}")
-    public User getId(@PathVariable(value = "ID") Long id, @RequestParam(value = "detail", required = false) Boolean detail) {
-        User returnUser;
-        if(detail=true){
-            returnUser = userService.getUserFromDatabaseByIdBasicVersion(id);
+    public UserDTO getUserById(@PathVariable(value = "ID") Long id, @RequestParam(value = "detail", required = false, defaultValue = "false") Boolean detail) throws RegistrationException, SQLException {
+        UserDTO finalUser;
+        User user;
+        if(Boolean.FALSE.equals(detail)){
+            user = userService.getUserFromDatabaseByIdBasicVersion(id);
+            finalUser = new UserBasicDTO(user.getId(), user.getName(), user.getSurname());
         }
-        else returnUser = userService.getUserFromDatabaseByIdFullVersion(id);
-
-        return returnUser;
+        else {
+            user = userService.getUserFromDatabaseByIdFullVersion(id);
+            finalUser = new UserFullDTO(user.getId(), user.getName(), user.getSurname(), user.getPersonID(), user.getUniqueId());
+        }
+        return finalUser;
     }
 
     @GetMapping("/users")
-    public List<User> getUsersBasicVersion(@RequestParam(value = "detail", required = false) Boolean detail) {
-        List<User> returnUsers;
-        if(detail=true) {
-            returnUsers = userService.getUsersFromDatabaseFullVersion();
-        }else returnUsers = userService.getUsersFromDatabaseBasicVersion();
+    public List<UserDTO> getUsersBasicVersion(@RequestParam(value = "detail", required = false, defaultValue = "false") Boolean detail) {
+        List<UserDTO> returnUsers;
+        if(Boolean.FALSE.equals(detail)) {
+            returnUsers = userService.getUsersFromDatabaseBasicVersion();
+        }else returnUsers = userService.getUsersFromDatabaseFullVersion();
 
         return returnUsers;
     }

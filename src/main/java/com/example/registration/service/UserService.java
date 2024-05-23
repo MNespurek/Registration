@@ -3,6 +3,8 @@ package com.example.registration.service;
 import com.example.registration.RegistrationException;
 import com.example.registration.config.Settings;
 import com.example.registration.model.User;
+import com.example.registration.model.dto.UserDTO;
+import com.example.registration.model.dto.UserFullDTO;
 import com.example.registration.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,7 @@ UserRepository userRepository;
     public void saveUserToDatabase(User user) throws RegistrationException, SQLException {
         userRepository.saveUserToDatabase(user);
     }
-    public User getUserFromDatabaseByIdBasicVersion(Long id) {
+    public User getUserFromDatabaseByIdBasicVersion(Long id) throws RegistrationException, SQLException {
         User userFromRepository = userRepository.getUserFromDatabaseByIdBasicVersion(id);
         return userFromRepository;
     }
@@ -33,13 +35,13 @@ UserRepository userRepository;
 
     }
 
-    public List<User> getUsersFromDatabaseBasicVersion() {
-        List<User> users = userRepository.getUsersFromDatabaseBasicVersion();
+    public List<UserDTO> getUsersFromDatabaseBasicVersion() {
+        List<UserDTO> users = userRepository.getUsersFromDatabaseBasicVersion();
         return users;
     }
 
-    public List<User> getUsersFromDatabaseFullVersion() {
-        List<User> users = userRepository.getUsersFromDatabaseFullVersion();
+    public List<UserDTO> getUsersFromDatabaseFullVersion() {
+        List<UserDTO> users = userRepository.getUsersFromDatabaseFullVersion();
         return users;
     }
 
