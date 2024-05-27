@@ -7,7 +7,6 @@ import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserFullDTO extends UserDTO {
-
     @JsonProperty("personId")
     private String personId;
     @JsonProperty("uniqueId")
@@ -19,4 +18,19 @@ public class UserFullDTO extends UserDTO {
     this.uniqueId = uniqueId;
     }
 
+    public String getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(String personId) {
+        this.personId = personId;
+    }
+
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(UUID uniqueId) {
+        this.uniqueId = uniqueId;
+    }
 }

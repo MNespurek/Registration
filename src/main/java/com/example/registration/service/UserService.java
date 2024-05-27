@@ -16,7 +16,6 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Service
-
 public class UserService {
 @Autowired
 UserRepository userRepository;
@@ -24,30 +23,34 @@ UserRepository userRepository;
     public void saveUserToDatabase(User user) throws RegistrationException, SQLException {
         userRepository.saveUserToDatabase(user);
     }
-    public User getUserFromDatabaseByIdBasicVersion(Long id) throws RegistrationException, SQLException {
+    public UserDTO getUserFromDatabaseByIdBasicVersion(Long id) throws RegistrationException, SQLException {
         User userFromRepository = userRepository.getUserFromDatabaseByIdBasicVersion(id);
-        return userFromRepository;
+        UserDTO userDTO = new UserDTO(userFromRepository.getId(), userFromRepository.getName(), userFromRepository.getSurname());
+        return userDTO;
     }
-
-    public User getUserFromDatabaseByIdFullVersion(Long id) {
+    public UserDTO getUserFromDatabaseByIdFullVersion(Long id) throws RegistrationException, SQLException {
         User userFromRepository = userRepository.getUserFromDatabaseFullVersion(id);
-        return userFromRepository;
-
+        UserDTO userDTO = new UserFullDTO(userFromRepository.getId(), userFromRepository.getName(), userFromRepository.getSurname(), userFromRepository.getPersonID(), userFromRepository.getUniqueId());
+        return userDTO;
     }
-
-    public List<UserDTO> getUsersFromDatabaseBasicVersion() {
-        List<UserDTO> users = userRepository.getUsersFromDatabaseBasicVersion();
-        return users;
+    public List<UserDTO> getUsersFromDatabaseBasicVersion() throws RegistrationException, SQLException {
+        List<User> users = userRepository.getUsersFromDatabaseBasicVersion();
+        List<UserDTO> usersDTO = new ArrayList<>();
+        for(User user : users) {
+            UserDTO userDTO = new UserDTO(user.getId(), user.getName(), user.getSurname());
+            usersDTO.add(userDTO);
+        }
+        return usersDTO;
     }
-
     public List<UserDTO> getUsersFromDatabaseFullVersion() {
-        List<UserDTO> users = userRepository.getUsersFromDatabaseFullVersion();
-        return users;
+        List<User> users = userRepository.getUsersFromDatabaseFullVersion();
+        List<UserDTO> usersDTO = new ArrayList<>();
+        for(User user : users) {
+            UserDTO userDTO = new UserFullDTO(user.getId(), user.getName(), user.getSurname(), user.getPersonID(), user.getUniqueId());
+            usersDTO.add(userDTO);
+        }
+        return usersDTO;
     }
-
-
-
-
     public User changeUserNameAndSurname(Long id, String name, String surname) throws RegistrationException, SQLException {
         User userFromRepository = userRepository.getUserFromDatabaseByIdBasicVersion(id);
         userFromRepository.setName(name);
@@ -55,13 +58,9 @@ UserRepository userRepository;
         userRepository.saveEditUserToDatabase(userFromRepository);
         return userFromRepository;
     }
-
-    public String deleteUserFromDatabaseById(Long id) throws RegistrationException, SQLException {
+    public void deleteUserFromDatabaseById(Long id) throws RegistrationException, SQLException {
         userRepository.deleteUserFromDatabase(id);
-        return "Uživatel s "+id+ "byl vymazán z databáze.";
     }
-
-
     public Set<String> setOfIdsFromFile() throws FileNotFoundException, SQLException, RegistrationException {
         Set<String> setFromDataPersonId = new HashSet<>();
 
@@ -70,7 +69,6 @@ UserRepository userRepository;
             while (scanner.hasNextLine()) {
                 String personIdFromFile = scanner.nextLine();
                 setFromDataPersonId.add(personIdFromFile);
-
             }
             return setFromDataPersonId;
 
@@ -79,11 +77,9 @@ UserRepository userRepository;
             throw new RegistrationException("Soubor "+Settings.PERSONIDFILE+ "nebyl nalezen!" +e);
         }
     }
-
     public Set<String> setOfIdsFromDatabase() throws RegistrationException, SQLException {
         return userRepository.setOfPersonIDsFromDatabase();
     }
-
     public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
         Set<String> setOfIdsFromDatabase = setOfIdsFromDatabase();
         Set<String> setOfIdsFromFile = setOfIdsFromFile();
@@ -92,5 +88,4 @@ UserRepository userRepository;
 
         return setOfIdsToSelectFrom;
     }
-
 }

@@ -8,13 +8,8 @@ import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
 
-
-
-
 public class User {
 
-    UserService userService;
-    UserRepository userRepository;
     private Long id;
     private String name;
 
@@ -27,7 +22,6 @@ public class User {
 
     public User() {
         this.uniqueId = UUID.randomUUID();
-
     }
 
     public User(Long id, String name, String surname) {
@@ -36,32 +30,11 @@ public class User {
         this.surname = surname;
     }
 
-
-    public User(String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
-        this.name = name;
-        this.surname = surname;
-        this.personID = personId;
-        this.uniqueId = uniqueId;
-
-    }
-
-
-
-
-    public User(Long id, String name, String surname, String personId) throws RegistrationException, SQLException, FileNotFoundException {
-        this(id, name, surname);
-        this.personID = personId;
-        this.uniqueId = UUID.randomUUID();
-    }
-
-
-
     public User(Long id, String name, String surname, String personId, UUID uniqueId) throws RegistrationException, SQLException, FileNotFoundException {
         this(id, name, surname);
         this.personID = personId;
         this.uniqueId = uniqueId;
     }
-
 
     public Long getId() {
         return id;
@@ -97,13 +70,4 @@ public class User {
     public String getPersonID() {
         return personID;
     }
-
-    /*public void setPersonId(String personId) throws RegistrationException, SQLException, FileNotFoundException, InvalidParameterException {
-
-        Set<String> setOfIdsToSelectFrom = setOfIdsToSelectFrom();
-        System.out.println(setOfIdsToSelectFrom);
-
-    }*/
-
-
 }
