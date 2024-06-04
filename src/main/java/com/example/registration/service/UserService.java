@@ -58,10 +58,10 @@ UserRepository userRepository;
         userRepository.saveEditUserToDatabase(userFromRepository);
         return userFromRepository;
     }
-    public void deleteUserFromDatabaseById(Long id) throws RegistrationException, SQLException {
+    public void deleteUserFromDatabaseById(Long id) throws RegistrationException {
         userRepository.deleteUserFromDatabase(id);
     }
-    public Set<String> setOfIdsFromFile() throws FileNotFoundException, SQLException, RegistrationException {
+    public Set<String> setOfIdsFromFile() throws RegistrationException {
         Set<String> setFromDataPersonId = new HashSet<>();
 
         try(Scanner scanner = new Scanner(new BufferedReader(new FileReader(Settings.PERSONIDFILE)))) {
@@ -77,10 +77,10 @@ UserRepository userRepository;
             throw new RegistrationException("Soubor "+Settings.PERSONIDFILE+ "nebyl nalezen!" +e);
         }
     }
-    public Set<String> setOfIdsFromDatabase() throws RegistrationException, SQLException {
+    public Set<String> setOfIdsFromDatabase() throws RegistrationException {
         return userRepository.setOfPersonIDsFromDatabase();
     }
-    public Set<String> setOfIdsToSelectFrom() throws RegistrationException, SQLException, FileNotFoundException {
+    public Set<String> setOfIdsToSelectFrom() throws RegistrationException {
         Set<String> setOfIdsFromDatabase = setOfIdsFromDatabase();
         Set<String> setOfIdsFromFile = setOfIdsFromFile();
         setOfIdsFromFile.removeAll(setOfIdsFromDatabase);

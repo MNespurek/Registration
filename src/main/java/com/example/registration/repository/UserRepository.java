@@ -33,7 +33,7 @@ public class UserRepository {
 
         }
     }
-    public Set<String> setOfPersonIDsFromDatabase() throws SQLException, RegistrationException {
+    public Set<String> setOfPersonIDsFromDatabase() throws RegistrationException {
         Set<String> setOfIdFromUsers = new HashSet<>();
         try (ResultSet resultset = connectionToDatabaseResultset(SettingsRepository.GETPERSONIDSFROMDATABASE)) {
 
@@ -47,7 +47,7 @@ public class UserRepository {
         }
         return setOfIdFromUsers;
     }
-    public void saveUserToDatabase(User user) throws SQLException, RegistrationException {
+    public void saveUserToDatabase(User user) throws RegistrationException {
         try(PreparedStatement preparedStatement = connectionToDatabasePrepareStatement(SettingsRepository.ADDUSERTODATABASE)) {
             preparedStatement.setString(1, user.getName());
             preparedStatement.setString(2, user.getSurname());
@@ -58,7 +58,7 @@ public class UserRepository {
             throw new RegistrationException("Nebylo nalezeno spojení s databází " +Settings.PERSONIDFILE+ "."+e.getMessage());
         }
     }
-    public void saveEditUserToDatabase(User user) throws SQLException, RegistrationException {
+    public void saveEditUserToDatabase(User user)  {
         try (PreparedStatement preparedStatement = connectionToDatabasePrepareStatement(SettingsRepository.editUserInDatabase())) {
 
             preparedStatement.setLong(3, user.getId());
@@ -72,7 +72,7 @@ public class UserRepository {
             throw new RuntimeException(e);
         }
     }
-    public void deleteUserFromDatabase(Long id) throws SQLException, RegistrationException {
+    public void deleteUserFromDatabase(Long id) throws RegistrationException {
         try (PreparedStatement preparedStatement = connectionToDatabasePrepareStatement(SettingsRepository.deleteUserFromDatabase())) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();

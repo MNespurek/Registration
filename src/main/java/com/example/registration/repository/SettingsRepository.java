@@ -6,7 +6,7 @@ public class SettingsRepository {
 
     public static final String USER = "root";
     public static final String PASSWORD = "Heslo123";
-    public static final String ADDUSERTODATABASE = "INSERT INTO USER (name, surname, personID, uuid) values(?, ?, ?, ?)";
+    public static final String ADDUSERTODATABASE = "INSERT INTO user (name, surname, personID, uuid) values(?, ?, ?, ?)";
     public static final String ID = "ID";
     public static final String PERSONID = "personID";
     public static final String NAME = "name";

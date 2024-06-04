@@ -17,7 +17,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     UserService userService;
-
+    //z venku chce mi zasílat v objektu i pohlaví a musí si s tím Controller poradit a dále pracovat. Data uložit do DB
+    //vytvářet objekt přes statickou proměnnou createObject s tím, že pokud zadá nevalidní parametr, pouze dojde k upozornění ne že spadne proces
     @PostMapping("/user")
     public String saveUser(@RequestBody User user) throws RegistrationException, SQLException, FileNotFoundException {
         String statement = "";
